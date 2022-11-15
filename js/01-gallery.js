@@ -19,25 +19,31 @@ const listOfImg = galleryItems
   .join("");
 
 galleryLocation.insertAdjacentHTML("beforeend", listOfImg);
+let galleryInstance;
 
-const clickOnImage = (evt) => {
+function closeInstance(evt) {
+  if (evt.code === "Escape") {
+    galleryInstance.close();
+  }
+}
+
+function clickOnImage(evt) {
   evt.preventDefault();
   const imageEl = evt.target;
   const currentImgEl = imageEl.classList.contains("gallery__image");
+
   if (!currentImgEl) {
     return;
   }
   const imageUrl = imageEl.dataset.source;
 
-  const galleryInstance = basicLightbox.create(`<img src="${imageUrl}"/>`);
+  galleryInstance = basicLightbox.create(`<img src="${imageUrl}"/>`, {
+    onShow: () => galleryLocation.addEventListener("keydown", closeInstance),
+    onClose: () =>
+      galleryLocation.removeEventListener("keydown", closeInstance),
+  });
 
   galleryInstance.show();
-
-  galleryLocation.addEventListener("keydown", (evt) => {
-    if (evt.key === "Escape") {
-      galleryInstance.close();
-    }
-  });
-};
+}
 
 galleryLocation.addEventListener("click", clickOnImage);
